@@ -78,6 +78,9 @@ install_host_packages() {
   echo "Installing necessary packages"
   apt update
   apt install -y dosfstools efibootmgr curl debootstrap gdisk dkms zfsutils-linux # Install efibootmgr 
+  # Setup efivards kernel module
+  echo "Setup efivars kernel module"
+  modprobe efivars
 }
 
 partition_disk() {
@@ -137,6 +140,10 @@ apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initr
 # Install efibootmgr and dosfstools
 echo "Installing additional important software"
 apt install -y dosfstools efibootmgr curl
+
+# Setup efivards kernel module
+echo "Setup efivars kernel module"
+modprobe efivars
 
 # Install system utilities
 echo "Installing system utilities..."
