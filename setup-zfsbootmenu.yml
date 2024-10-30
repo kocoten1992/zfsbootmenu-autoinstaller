@@ -30,7 +30,7 @@
     POOL_DISK: '/dev/nvme0n1'  # Adjust as needed
     POOL_PART: '2'
     POOL_DEVICE: "{{ POOL_DISK }}p{{ POOL_PART }}"
-    KERNEL_VERSION: '6.1.0.25-amd64'
+    KERNEL_VERSION: '6.1.0-25-amd64'
   tasks:
     - name: Configure apt sources
       copy:
