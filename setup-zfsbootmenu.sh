@@ -74,6 +74,12 @@ deb-src http://deb.debian.org/debian bookworm-backports main contrib non-free-fi
 EOF
 }
 
+install_host_packages() {
+  echo "Installing necessary packages"
+  apt update
+  apt install -y dosfstools efibootmgr curl debootstrap gdisk dkms zfsutils-linux # Install efibootmgr 
+}
+
 partition_disk() {
   echo "Partitioning disk $POOL_DISK..."
   sgdisk --zap-all $POOL_DISK
@@ -126,7 +132,11 @@ $(configure_apt_sources)
 # Update and install necessary packages
 export DEBIAN_FRONTEND=noninteractive
 apt update
-apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initramfs dosfstools efibootmgr curl
+apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initramfs
+
+# Install efibootmgr and dosfstools
+echo "Installing additional important software"
+apt install -y dosfstools efibootmgr curl
 
 # Install system utilities
 echo "Installing system utilities..."
@@ -192,8 +202,7 @@ select_disk
 get_username_and_password
 generate_hostid
 configure_apt_sources
-apt update
-apt install -y debootstrap gdisk dkms zfsutils-linux
+install_host_packages
 partition_disk
 create_zpool
 export_import_zpool
