@@ -17,12 +17,21 @@
     POOL_DEVICE: "{{ POOL_DISK }}p{{ POOL_PART }}"
     KERNEL_VERSION: '6.1.0.25-amd64'
   tasks:
-    - name: Ensure contrib and non-free-firmware components are in apt sources
-      lineinfile:
-        path: /etc/apt/sources.list
-        regexp: '^deb.*http://deb.debian.org/debian/.*main'
-        line: 'deb http://deb.debian.org/debian/ bookworm main contrib non-free-firmware'
-        state: present
+    - name: Configure apt sources
+      copy:
+        dest: /etc/apt/sources.list
+        content: |
+          deb http://deb.debian.org/debian bookworm main contrib non-free-firmware
+          deb-src http://deb.debian.org/debian bookworm main contrib non-free-firmware
+
+          deb http://deb.debian.org/debian-security bookworm-security main contrib non-free-firmware
+          deb-src http://deb.debian.org/debian-security/ bookworm-security main contrib non-free-firmware
+
+          deb http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+          deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+
+          deb http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
+          deb-src http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
 
     - name: Update apt cache
       apt:
