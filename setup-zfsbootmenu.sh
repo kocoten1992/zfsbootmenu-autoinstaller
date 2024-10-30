@@ -1,13 +1,5 @@
 #!/bin/bash
 
-# Prompt user for variables
-read -p "Enter username for the new user: " USERNAME
-read -sp "Enter password for the new user: " USER_PASSWORD
-echo
-read -sp "Enter root password: " ROOT_PASSWORD
-echo
-read -p "Enter hostname for this system: " HOSTNAME
-
 # Automatically set other variables
 BOOT_DISK="/dev/nvme0n1"
 BOOT_PART="1"
@@ -17,6 +9,47 @@ POOL_NAME="zroot"
 KERNEL_VERSION=$(uname -r)  # Automatically get current kernel version
 MOUNT_POINT="/mnt"
 ID=$(source /etc/os-release && echo "$ID")  # Get OS ID from /etc/os-release
+
+get_username_and_password(){
+  # Prompt user for variables
+  read -p "Enter username for the new user: " USERNAME
+  read -sp "Enter password for the new user: " USER_PASSWORD
+  echo
+  read -sp "Enter root password: " ROOT_PASSWORD
+  echo
+  read -p "Enter hostname for this system: " HOSTNAME
+}
+
+select_disk() {
+  echo "Available disks:"
+  # List available disks with lsblk and store them in an array
+  mapfile -t disks < <(lsblk -dn -o NAME,SIZE,TYPE | grep 'disk')
+
+  # Display disks with numbering
+  for i in "${!disks[@]}"; do
+    echo "$((i + 1)). ${disks[i]}"
+  done
+
+  # Prompt user to select a disk by number
+  while true; do
+    read -p "Enter the number of the disk you want to use for boot and pool (e.g., 1, 2): " choice
+    if [[ $choice -gt 0 && $choice -le ${#disks[@]} ]]; then
+      # Get the selected disk name (e.g., 'sda' from 'sda 500G disk')
+      selected_disk=$(echo "${disks[$((choice - 1))]}" | awk '{print $1}')
+      BOOT_DISK="/dev/$selected_disk"
+      POOL_DISK="/dev/$selected_disk"
+      echo "Selected disk: $BOOT_DISK"
+      break
+    else
+      echo "Invalid choice. Please select a number from the list."
+    fi
+  done
+  echo "Boot Disk is set to $BOOT_DISK"
+  echo "Pool Disk is set to $POOL_DISK"
+}
+
+
+
 
 # Functions
 generate_hostid() {
@@ -155,6 +188,8 @@ final_cleanup() {
 
 # Execution sequence
 echo "Starting ZFS Boot Menu installation..."
+select_disk
+get_username_and_password
 generate_hostid
 configure_apt_sources
 apt update
