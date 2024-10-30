@@ -6,6 +6,21 @@
     - name: "ansible_become_password"
       prompt: "Enter sudo password for chroot tasks"
       private: yes
+    - name: "username"
+      prompt: "Enter the username for the new user"
+      private: no  # Set to `yes` to hide input
+
+    - name: "user_password"
+      prompt: "Enter the password for the new user"
+      private: yes
+
+    - name: "root_password"
+      prompt: "Enter the root password"
+      private: yes
+
+    - name: "hostname"
+      prompt: "Enter the hostname for this system"
+      private: no
   vars:
     # ID: "{{ lookup('ini', 'ID section=None file=/etc/os-release') }}"
     ID: "debian"
@@ -177,13 +192,6 @@
   become: true
   become_method: sudo
   gather_facts: false
-  vars:
-    # ID: "{{ lookup('ini', 'ID section=None file=/etc/os-release') }}"
-    ID: "debian"
-    username: 'YOUR_USERNAME'  # Replace with your desired username
-    user_password: 'YOUR_USER_PASSWORD'  # Replace with your desired password
-    root_password: 'YOUR_ROOT_PASSWORD'  # Replace with your desired root password
-    hostname: 'YOURHOSTNAME'  # Replace with your desired hostname
   tasks:
     - name: Set hostname
       hostname:
