@@ -130,12 +130,24 @@ enter_chroot() {
   echo "127.0.1.1    $HOSTNAME" >> /etc/hosts
   
   # Configure apt sources
-  $(configure_apt_sources)
+  cat > /etc/apt/sources.list <<EOF_APT
+  deb http://deb.debian.org/debian bookworm main contrib non-free-firmware
+  deb-src http://deb.debian.org/debian bookworm main contrib non-free-firmware
+  
+  deb http://deb.debian.org/debian-security bookworm-security main contrib non-free-firmware
+  deb-src http://deb.debian.org/debian-security/ bookworm-security main contrib non-free-firmware
+  
+  deb http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+  deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+  
+  deb http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
+  deb-src http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
+  EOF_APT
   
   # Update and install necessary packages
   export DEBIAN_FRONTEND=noninteractive
   apt update
-  apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 
+  apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 dkms
 
   apt install -y zfsutils-linux
 
