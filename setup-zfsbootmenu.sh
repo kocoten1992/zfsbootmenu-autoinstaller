@@ -210,6 +210,7 @@ enter_chroot() {
 	# Install ZFSBootMenu
 	echo "Installing ZFSBootMenu..."
 	mkdir -p /boot/efi/EFI/ZBM
+ 	mkdir -p /boot/efi/EFI/BOOT
 	curl -o /boot/efi/EFI/ZBM/VMLINUZ.EFI -L https://get.zfsbootmenu.org/efi
 	cp /boot/efi/EFI/ZBM/VMLINUZ.EFI /boot/efi/EFI/ZBM/VMLINUZ-BACKUP.EFI
 	cp /boot/efi/EFI/ZBM/VMLINUZ.EFI /boot/efi/EFI/BOOT/bootx64.efi  # Default path if needed
