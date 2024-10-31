@@ -115,78 +115,98 @@ setup_base_system() {
 }
 
 prepare_chroot() {
-  echo "Mounting filesystems for chroot environment..."
-  mount --bind /dev $MOUNT_POINT/dev
-  mount --bind /proc $MOUNT_POINT/proc
-  mount --bind /sys $MOUNT_POINT/sys
-  mount --bind /dev/pts $MOUNT_POINT/dev/pts
-}
-
-enter_chroot() {
   echo "Entering chroot environment to configure system..."
   chroot $MOUNT_POINT /bin/bash <<EOF
-# Set hostname
-echo "$HOSTNAME" > /etc/hostname
-echo "127.0.1.1    $HOSTNAME" >> /etc/hosts
+  # Set hostname
+  echo "$HOSTNAME" > /etc/hostname
+  echo "127.0.1.1    $HOSTNAME" >> /etc/hosts
+  
+  # Configure apt sources
+  $(configure_apt_sources)
+  
+  # Update and install necessary packages
+  export DEBIAN_FRONTEND=noninteractive
+  apt update
+  apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initramfs dosfstools efibootmgr curl
+  
+  # Install system utilities
+  echo "Installing system utilities..."
+  apt install -y systemd-timesyncd net-tools iproute2 isc-dhcp-client iputils-ping traceroute curl wget dnsutils ethtool ifupdown tcpdump nmap nano vim htop openssh-server git tmux
+  
+  # Perform system upgrade
+  echo "Running dist-upgrade to upgrade all packages to the latest version..."
+  apt full-upgrade -y
+  
+  # Set locale and timezone
+  echo "Configuring locale and timezone..."
+  echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
+  locale-gen
+  dpkg-reconfigure -f noninteractive tzdata
+  
+  # Set root password
+  echo "Setting root password..."
+  echo "root:$ROOT_PASSWORD" | chpasswd
+  
+  # Create user and set password
+  echo "Creating user and setting permissions..."
+  useradd -m -s /bin/bash -G sudo,audio,cdrom,dip,floppy,netdev,plugdev,video $USERNAME
+  echo "$USERNAME:$USER_PASSWORD" | chpasswd
+  
+  # Enable systemd ZFS services
+  echo "Enabling systemd ZFS services..."
+  systemctl enable zfs.target
+  systemctl enable zfs-import-cache
+  systemctl enable zfs-mount
+  systemctl enable zfs-import.target
+  
+  # Rebuild initramfs
+  echo "Rebuilding initramfs..."
+  update-initramfs -c -k all
+  
+  # Set ZFSBootMenu command-line arguments for inherited ZFS properties
+  echo "Configuring ZFSBootMenu command-line arguments..."
+  zfs set org.zfsbootmenu:commandline="quiet" $POOL_NAME/ROOT
+  
+  # Set up EFI filesystem
+  echo "Setting up EFI filesystem..."
+  mkfs.vfat -F32 ${BOOT_DISK}p${BOOT_PART}
+  
+  # Configure fstab entry for EFI
+  echo "Configuring fstab for EFI partition..."
+  cat << EOF_FSTAB >> /etc/fstab
+  $(blkid | grep "${BOOT_DISK}p${BOOT_PART}" | cut -d ' ' -f 2) /boot/efi vfat defaults 0 0
+  EOF_FSTAB
+  
+  # Mount EFI partition
+  mkdir -p /boot/efi
+  mount /boot/efi
+  
+  # Install ZFSBootMenu
+  echo "Installing ZFSBootMenu..."
+  mkdir -p /boot/efi/EFI/ZBM
+  curl -o /boot/efi/EFI/ZBM/VMLINUZ.EFI -L https://get.zfsbootmenu.org/efi
+  cp /boot/efi/EFI/ZBM/VMLINUZ.EFI /boot/efi/EFI/ZBM/VMLINUZ-BACKUP.EFI
+  cp /boot/efi/EFI/ZBM/VMLINUZ.EFI /boot/efi/EFI/BOOT/bootx64.efi  # Default path if needed
+  
+  # Mount EFI variables if needed
+  echo "Mounting efivarfs for boot entry setup..."
+  mount -t efivarfs efivarfs /sys/firmware/efi/efivars
+  
+  # Install and configure EFI boot manager
+  apt install -y efibootmgr
+  echo "Configuring EFI boot entries..."
+  efibootmgr -c -d "$BOOT_DISK" -p "$BOOT_PART" -L "ZFSBootMenu (Backup)" -l '\EFI\ZBM\VMLINUZ-BACKUP.EFI'
+  efibootmgr -c -d "$BOOT_DISK" -p "$BOOT_PART" -L "ZFSBootMenu" -l '\EFI\ZBM\VMLINUZ.EFI'
+  efibootmgr -c -d "$BOOT_DISK" -p "$BOOT_PART" -L "ZFSBootMenu" -l '\EFI\BOOT\bootx64.efi'
+  
+  # Perform a distribution upgrade
+  echo "Running dist-upgrade to upgrade all packages to the latest version..."
+  apt full-upgrade -y
 
-# Configure apt sources
-$(configure_apt_sources)
+  # add full debian setup (tasksel)
+  echo "tasksel"
+  tasksel --new-install
 
-# Update and install necessary packages
-export DEBIAN_FRONTEND=noninteractive
-apt update
-apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initramfs
-
-# Install efibootmgr and dosfstools
-echo "Installing additional important software"
-apt install -y dosfstools efibootmgr curl
-
-# Setup efivards kernel module
-echo "Setup efivars kernel module"
-modprobe efivars
-
-# Install system utilities
-echo "Installing system utilities..."
-apt install -y systemd-timesyncd net-tools iproute2 isc-dhcp-client iputils-ping traceroute curl wget dnsutils ethtool ifupdown tcpdump nmap nano vim htop openssh-server git tmux
-
-# Perform system upgrade
-echo "Upgrading system packages..."
-apt upgrade -y
-
-# Set locale and timezone
-echo "Configuring locale and timezone..."
-echo "en_US.UTF-8 UTF-8" > /etc/locale.gen
-locale-gen
-dpkg-reconfigure -f noninteractive tzdata
-
-# Set root password
-echo "Setting root password..."
-echo "root:$ROOT_PASSWORD" | chpasswd
-
-# Create user and set password
-echo "Creating user and setting permissions..."
-useradd -m -s /bin/bash -G sudo,audio,cdrom,dip,floppy,netdev,plugdev,video $USERNAME
-echo "$USERNAME:$USER_PASSWORD" | chpasswd
-
-# Configure ZFSBootMenu
-echo "Setting up ZFSBootMenu EFI configuration..."
-mkdir -p /boot/efi/EFI/ZBM
-curl -Lo /boot/efi/EFI/ZBM/VMLINUZ.EFI https://get.zfsbootmenu.org/efi
-
-# Create EFI filesystem on boot partition and mount
-mkfs.vfat ${BOOT_DISK}p${BOOT_PART}
-mkdir -p /boot/efi
-mount ${BOOT_DISK}p${BOOT_PART} /boot/efi
-
-# Set up EFI boot entries
-echo "Adding EFI boot entries..."
-efibootmgr -c -d ${BOOT_DISK} -p $BOOT_PART -L "ZFSBootMenu" -l '\\EFI\\ZBM\\VMLINUZ.EFI'
-efibootmgr -c -d ${BOOT_DISK} -p $BOOT_PART -L "ZFSBootMenu (Backup)" -l '\\EFI\\ZBM\\VMLINUZ-BACKUP.EFI'
-efibootmgr -c -d ${BOOT_DISK} -p $BOOT_PART -L "ZFSBootMenu" -l '\\EFI\\BOOT\\bootx64.efi'
-
-# Perform a distribution upgrade
-echo "Running dist-upgrade to upgrade all packages to the latest version..."
-apt full-upgrade -y
 EOF
 }
 
