@@ -115,6 +115,14 @@ setup_base_system() {
 }
 
 prepare_chroot() {
+  echo "Mounting filesystems for chroot environment..."
+  mount --bind /dev $MOUNT_POINT/dev
+  mount --bind /proc $MOUNT_POINT/proc
+  mount --bind /sys $MOUNT_POINT/sys
+  mount --bind /dev/pts $MOUNT_POINT/dev/pts
+}
+
+enter_chroot() {
   echo "Entering chroot environment to configure system..."
   chroot $MOUNT_POINT /bin/bash <<EOF
   # Set hostname
