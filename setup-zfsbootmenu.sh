@@ -231,7 +231,7 @@ enter_chroot() {
 	
 	# add full debian setup (tasksel)
 	echo "tasksel"
-	tasksel --new-install
+	tasksel install standard
 	
 	EOF
 }
