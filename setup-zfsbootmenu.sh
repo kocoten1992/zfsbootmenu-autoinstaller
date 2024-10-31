@@ -138,6 +138,8 @@ enter_chroot() {
   apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 
 
   apt install -y zfs-initramfs dosfstools efibootmgr curl
+
+  echo "REMAKE_INITRD=yes" > /etc/dkms/zfs.conf
   
   # Install system utilities
   echo "Installing system utilities..."
