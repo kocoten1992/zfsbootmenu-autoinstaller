@@ -247,6 +247,8 @@ cleanup_chroot() {
 
 final_cleanup() {
   echo "Exporting ZFS pool and completing installation..."
+  mount | grep -v zfs | tac | awk '/\/mnt/ {print $3}' | \
+    xargs -i{} umount -lf {}
   zpool export -a
 }
 
