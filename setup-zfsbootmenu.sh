@@ -137,6 +137,8 @@ enter_chroot() {
   apt update
   apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 
 
+  apt install -y zfsutils-linux
+
   apt install -y zfs-initramfs dosfstools efibootmgr curl
 
   echo "REMAKE_INITRD=yes" > /etc/dkms/zfs.conf
