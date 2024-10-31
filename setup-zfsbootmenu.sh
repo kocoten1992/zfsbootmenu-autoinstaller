@@ -127,7 +127,9 @@ prepare_chroot() {
   # Update and install necessary packages
   export DEBIAN_FRONTEND=noninteractive
   apt update
-  apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 zfs-initramfs dosfstools efibootmgr curl
+  apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 
+
+  apt install -y zfs-initramfs dosfstools efibootmgr curl
   
   # Install system utilities
   echo "Installing system utilities..."
