@@ -21,9 +21,13 @@ This script automates the installation and configuration of ZFSBootMenu on a Lin
    Boot into your live environment, open a terminal, run the following to start the script
 
    ```bash
+   sudo su # switches to root
    apt update
+   apt upgrade
    apt install curl
-   curl -sSL https://raw.githubusercontent.com/NLaundry/zfsbootmenu-autoinstaller/main/setup-zfsbootmenu.sh | bash
+   curl -O https://raw.githubusercontent.com/NLaundry/zfsbootmenu-autoinstaller/main/setup-zfsbootmenu.sh
+   chmod +x
+   ./setup-zfsbootmenu.sh
    ```
 
 3. **Follow Prompts**  
