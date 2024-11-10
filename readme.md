@@ -21,19 +21,19 @@ This script automates the installation and configuration of ZFSBootMenu on a Lin
    Boot into your live environment, open a terminal, and download the script.
 
    ```bash
-   curl -O https://path-to-your-script.sh
-   chmod +x script.sh
-   sudo ./script.sh
+   apt update
+   apt install curl
+   curl -sSL https://raw.githubusercontent.com/NLaundry/zfsbootmenu-autoinstaller/main/setup-zfsbootmenu.sh | bash
    ```
 
-2. **Follow Prompts**  
+3. **Follow Prompts**  
    - The script will prompt you for:
      - **Username** and **password** for a new user
      - **Root password**
      - **Hostname**
      - **Disk selection** for the boot and pool partitions
 
-3. **Automatic Steps**  
+4. **Automatic Steps**  
    - The script will automatically:
      - Configure APT sources
      - Install required packages
@@ -43,7 +43,7 @@ This script automates the installation and configuration of ZFSBootMenu on a Lin
      - Install and configure ZFSBootMenu and EFI boot entries
      - Perform cleanup
 
-4. **Completion**  
+5. **Completion**  
    - After running, the system is ready to reboot into the new ZFSBootMenu setup.
 
 ## Configuration
