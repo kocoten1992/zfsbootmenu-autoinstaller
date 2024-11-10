@@ -18,7 +18,7 @@ This script automates the installation and configuration of ZFSBootMenu on a Lin
 ## Usage
 
 1. **Run the Script**  
-   Boot into your live environment, open a terminal, and download the script.
+   Boot into your live environment, open a terminal, run the following to start the script
 
    ```bash
    apt update
