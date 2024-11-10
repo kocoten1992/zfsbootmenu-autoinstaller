@@ -1,6 +1,12 @@
-# Ansible Playbook for installing zfsbootmenu on Debian
+# ZFS Boot Menu Install Script
 
-## Stuff I did while testing stuff out
+## How to run
+
+`wget -qO- https://raw.githubusercontent.com/username/repo/branch/path/to/script.sh | bash`
+
+
+
+## Other random Notes
 
 ### Ansible setup
 [Ansible Docs](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
