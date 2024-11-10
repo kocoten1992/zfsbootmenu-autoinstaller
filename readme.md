@@ -1,18 +1,73 @@
-# ZFS Boot Menu Install Script
+# ZFSBootMenu Installation Script
 
-## How to run
+This script automates the installation and configuration of ZFSBootMenu on a Linux system from a live installation environment. It has been tested on Debian and sets up a ZFS root with EFI boot using ZFSBootMenu.
 
-`wget -qO- https://raw.githubusercontent.com/username/repo/branch/path/to/script.sh | bash`
+## Prerequisites
 
+- A live installation environment (e.g., Debian Live)
+- A disk available for partitioning and installation (existing data will be erased)
+- Network connection for downloading packages and files
 
+## Features
 
-## Other random Notes
+- Configures Debian repositories and installs necessary packages
+- Creates and configures ZFS partitions and filesystems
+- Sets up ZFSBootMenu for EFI boot
+- Adds a user with sudo privileges and configures the system for basic usage
 
-### Ansible setup
-[Ansible Docs](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+## Usage
 
-- Install ansible: `pipx install --include-deps ansible`
-- Install ansible community for chroot stuff: `ansible-galaxy collection install community.general`
+1. **Run the Script**  
+   Boot into your live environment, open a terminal, and download the script.
 
-- Testing
-    - `ansible-playbook --check setup-zfsbootmenu.yml -i inventory.yml`
+   ```bash
+   curl -O https://path-to-your-script.sh
+   chmod +x script.sh
+   sudo ./script.sh
+   ```
+
+2. **Follow Prompts**  
+   - The script will prompt you for:
+     - **Username** and **password** for a new user
+     - **Root password**
+     - **Hostname**
+     - **Disk selection** for the boot and pool partitions
+
+3. **Automatic Steps**  
+   - The script will automatically:
+     - Configure APT sources
+     - Install required packages
+     - Partition the selected disk
+     - Create and configure ZFS pool and datasets
+     - Set up a chroot environment
+     - Install and configure ZFSBootMenu and EFI boot entries
+     - Perform cleanup
+
+4. **Completion**  
+   - After running, the system is ready to reboot into the new ZFSBootMenu setup.
+
+## Configuration
+
+This script sets default variables for installation, including:
+
+- `BOOT_DISK`: Device for the boot partition (default `/dev/nvme0n1`)
+- `POOL_DISK`: Device for the ZFS pool (default `/dev/nvme0n1`)
+- `POOL_NAME`: Name of the ZFS pool (default `zroot`)
+- `KERNEL_VERSION`: The current kernel version, determined automatically
+
+You can modify these defaults directly in the script if needed.
+
+## Important Notes
+
+- **Warning**: This script will erase all data on the selected disk.
+- **Compatibility**: This script has been tested on Debian. Usage on other distributions may require modifications.
+- **Network**: Ensure a working internet connection, as the script will download packages.
+
+## Troubleshooting
+
+- **Permissions**: Run the script with `sudo` to ensure it has the necessary permissions.
+- **Disk Selection**: If no suitable disks are shown, confirm your disks are properly detected (`lsblk` can help).
+
+## License
+
+This script is provided as-is. Feel free to modify and adapt it to suit your needs.
