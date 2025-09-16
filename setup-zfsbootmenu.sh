@@ -6,6 +6,7 @@ POOL_PART="2"
 POOL_NAME="zroot"
 MOUNT_POINT="/mnt"
 ID=$(source /etc/os-release && echo "$ID")  # Get OS ID from /etc/os-release
+VERSION_CODENAME=$(grep VERSION_CODENAME /etc/os-release | cut -d'=' -f2) # get codename
 
 get_username_and_password(){
   # Prompt user for variables
@@ -57,17 +58,17 @@ generate_hostid() {
 configure_apt_sources() {
   echo "Configuring APT sources..."
   cat > /etc/apt/sources.list <<EOF
-deb http://deb.debian.org/debian bookworm main contrib non-free-firmware
-deb-src http://deb.debian.org/debian bookworm main contrib non-free-firmware
+deb http://deb.debian.org/debian $VERSION_CODENAME main contrib non-free-firmware
+deb-src http://deb.debian.org/debian $VERSION_CODENAME main contrib non-free-firmware
 
-deb http://deb.debian.org/debian-security bookworm-security main contrib non-free-firmware
-deb-src http://deb.debian.org/debian-security/ bookworm-security main contrib non-free-firmware
+deb http://deb.debian.org/debian-security $VERSION_CODENAME-security main contrib non-free-firmware
+deb-src http://deb.debian.org/debian-security/ $VERSION_CODENAME-security main contrib non-free-firmware
 
-deb http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
-deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+deb http://deb.debian.org/debian $VERSION_CODENAME-updates main contrib non-free-firmware
+deb-src http://deb.debian.org/debian $VERSION_CODENAME-updates main contrib non-free-firmware
 
-deb http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
-deb-src http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
+deb http://deb.debian.org/debian $VERSION_CODENAME-backports main contrib non-free-firmware
+deb-src http://deb.debian.org/debian $VERSION_CODENAME-backports main contrib non-free-firmware
 EOF
 }
 
@@ -108,7 +109,7 @@ export_import_zpool() {
 
 setup_base_system() {
   echo "Installing base system with debootstrap..."
-  debootstrap bookworm $MOUNT_POINT
+  debootstrap $VERSION_CODENAME $MOUNT_POINT
   cp /etc/hostid $MOUNT_POINT/etc/hostid
   cp /etc/resolv.conf $MOUNT_POINT/etc/resolv.conf
 }
@@ -130,17 +131,17 @@ enter_chroot() {
 	
 	# Configure apt sources
 		cat > /etc/apt/sources.list <<-EOF_APT
-		deb http://deb.debian.org/debian bookworm main contrib non-free-firmware
-		deb-src http://deb.debian.org/debian bookworm main contrib non-free-firmware
+		deb http://deb.debian.org/debian $VERSION_CODENAME main contrib non-free-firmware
+		deb-src http://deb.debian.org/debian $VERSION_CODENAME main contrib non-free-firmware
 		
-		deb http://deb.debian.org/debian-security bookworm-security main contrib non-free-firmware
-		deb-src http://deb.debian.org/debian-security/ bookworm-security main contrib non-free-firmware
+		deb http://deb.debian.org/debian-security $VERSION_CODENAME-security main contrib non-free-firmware
+		deb-src http://deb.debian.org/debian-security/ $VERSION_CODENAME-security main contrib non-free-firmware
 		
-		deb http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
-		deb-src http://deb.debian.org/debian bookworm-updates main contrib non-free-firmware
+		deb http://deb.debian.org/debian $VERSION_CODENAME-updates main contrib non-free-firmware
+		deb-src http://deb.debian.org/debian $VERSION_CODENAME-updates main contrib non-free-firmware
 		
-		deb http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
-		deb-src http://deb.debian.org/debian bookworm-backports main contrib non-free-firmware
+		deb http://deb.debian.org/debian $VERSION_CODENAME-backports main contrib non-free-firmware
+		deb-src http://deb.debian.org/debian $VERSION_CODENAME-backports main contrib non-free-firmware
 		EOF_APT
 	
 	# Update and install necessary packages
