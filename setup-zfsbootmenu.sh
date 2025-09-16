@@ -75,7 +75,9 @@ EOF
 
 install_host_packages() {
   echo "Installing necessary packages"
+  export DEBIAN_FRONTEND=noninteractive
   apt update
+  apt install -y linux-headers-generic
   apt install -y dosfstools efibootmgr curl debootstrap gdisk dkms zfsutils-linux # Install efibootmgr 
   # Setup efivards kernel module
   echo "Setup efivars kernel module"
