@@ -52,7 +52,7 @@ select_disk() {
 # Functions
 generate_hostid() {
   echo "Generating host ID..."
-  zgenhostid -f 0x00bab10c
+  zgenhostid -f
 }
 
 configure_apt_sources() {
@@ -256,9 +256,9 @@ final_cleanup() {
 echo "Starting ZFS Boot Menu installation..."
 select_disk
 get_username_and_password
-generate_hostid
 configure_apt_sources
 install_host_packages
+generate_hostid
 partition_disk
 create_zpool
 export_import_zpool
