@@ -92,7 +92,7 @@ partition_disk() {
 
 create_zpool() {
   echo "Creating ZFS pool and datasets..."
-  zpool create -f -o ashift=12 -O compression=lz4 -O acltype=posixacl -O xattr=sa -O relatime=on -o autotrim=on -o compatibility=openzfs-2.1-linux -m none $POOL_NAME ${POOL_DISK}${POOL_PART}
+  zpool create -f -o ashift=12 -o acltype=posixacl -o xattr=sa -m none $POOL_NAME ${POOL_DISK}${POOL_PART}
   zfs create -o mountpoint=none $POOL_NAME/ROOT
   zfs create -o mountpoint=/ -o canmount=noauto $POOL_NAME/ROOT/$ID
   zfs create -o mountpoint=/home $POOL_NAME/home
