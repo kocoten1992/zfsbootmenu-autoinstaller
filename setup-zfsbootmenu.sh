@@ -1,9 +1,7 @@
 #!/bin/bash
 
 # Automatically set other variables
-BOOT_DISK="/dev/nvme0n1"
 BOOT_PART="1"
-POOL_DISK="/dev/nvme0n1"
 POOL_PART="2"
 POOL_NAME="zroot"
 MOUNT_POINT="/mnt"
