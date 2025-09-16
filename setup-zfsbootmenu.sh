@@ -6,7 +6,6 @@ BOOT_PART="1"
 POOL_DISK="/dev/nvme0n1"
 POOL_PART="2"
 POOL_NAME="zroot"
-KERNEL_VERSION=$(uname -r)  # Automatically get current kernel version
 MOUNT_POINT="/mnt"
 ID=$(source /etc/os-release && echo "$ID")  # Get OS ID from /etc/os-release
 
@@ -147,7 +146,7 @@ enter_chroot() {
 	# Update and install necessary packages
 	export DEBIAN_FRONTEND=noninteractive
 	apt update
-	apt install -y locales linux-headers-$KERNEL_VERSION linux-image-amd64 dkms
+	apt install -y locales linux-headers-generic linux-image-amd64 dkms
 	
 	apt install -y zfsutils-linux
 	
