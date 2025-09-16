@@ -157,7 +157,7 @@ enter_chroot() {
 	
 	# Install system utilities
 	echo "Installing system utilities..."
-	apt install -y systemd-timesyncd net-tools iproute2 isc-dhcp-client iputils-ping traceroute curl wget dnsutils ethtool ifupdown tcpdump nmap nano vim htop openssh-server git tmux
+	apt install -y network-manager systemd-timesyncd net-tools iproute2 isc-dhcp-client iputils-ping traceroute curl wget dnsutils ethtool ifupdown tcpdump nmap nano vim htop openssh-server git tmux
 	
 	# Perform system upgrade
 	echo "Running dist-upgrade to upgrade all packages to the latest version..."
