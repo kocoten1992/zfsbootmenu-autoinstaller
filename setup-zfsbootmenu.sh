@@ -92,7 +92,7 @@ partition_disk() {
 
 create_zpool() {
   echo "Creating ZFS pool and datasets..."
-  zpool create -f -o ashift=12 -O compression=lz4 -O acltype=posixacl -O xattr=sa -O relatime=on -o autotrim=on -o compatibility=openzfs-2.1-linux -m none $POOL_NAME ${POOL_DISK}p${POOL_PART}
+  zpool create -f -o ashift=12 -O compression=lz4 -O acltype=posixacl -O xattr=sa -O relatime=on -o autotrim=on -o compatibility=openzfs-2.1-linux -m none $POOL_NAME ${POOL_DISK}${POOL_PART}
   zfs create -o mountpoint=none $POOL_NAME/ROOT
   zfs create -o mountpoint=/ -o canmount=noauto $POOL_NAME/ROOT/$ID
   zfs create -o mountpoint=/home $POOL_NAME/home
@@ -195,12 +195,12 @@ enter_chroot() {
 	
 	# Set up EFI filesystem
 	echo "Setting up EFI filesystem..."
-	mkfs.vfat -F32 ${BOOT_DISK}p${BOOT_PART}
+	mkfs.vfat -F32 ${BOOT_DISK}${BOOT_PART}
 	
 	# Configure fstab entry for EFI
 	echo "Configuring fstab for EFI partition..."
 		cat <<-EOF_FSTAB >> /etc/fstab
-		$(blkid | grep "${BOOT_DISK}p${BOOT_PART}" | cut -d ' ' -f 2) /boot/efi vfat defaults 0 0
+		$(blkid | grep "${BOOT_DISK}${BOOT_PART}" | cut -d ' ' -f 2) /boot/efi vfat defaults 0 0
 		EOF_FSTAB
 	
 	# Mount EFI partition
